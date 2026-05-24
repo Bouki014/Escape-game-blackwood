@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Manoir Blackwood — Murder Mystery</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold: #c9a84c;
+  --gold-light: #e8c96d;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-border: rgba(201,168,76,0.3);
+  --bg: #0a0908;
+  --bg2: #110f0d;
+  --bg3: #181410;
+  --bg4: #1e1a15;
+  --text: #e8dcc8;
+  --text2: #a89880;
+  --text3: #6b5d4a;
+  --red: #c0392b;
+  --red-dim: rgba(192,57,43,0.15);
+  --purple: #6c4c8a;
+  --purple-dim: rgba(108,76,138,0.2);
+  --teal: #2a7a6a;
+  --teal-dim: rgba(42,122,106,0.2);
+  --coral: #8a4c2a;
+  --coral-dim: rgba(138,76,42,0.2);
+  --radius: 6px;
+  --radius-lg: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(108,76,138,0.04) 0%, transparent 60%);
+}
+
+/* API KEY SCREEN */
+#api-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.api-card {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+.api-card .crest { font-size: 48px; margin-bottom: 1rem; }
+.api-card h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+.api-card p { color: var(--text2); font-size: 15px; margin-bottom: 1.5rem; line-height: 1.7; }
+.api-card input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: monospace;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+}
+.api-card input:focus { border-color: var(--gold); }
+.api-card input::placeholder { color: var(--text3); }
+.api-card a { color: var(--gold); text-decoration: none; font-size: 13px; }
+.api-card a:hover { text-decoration: underline; }
+.btn-primary {
+  width: 100%;
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius);
+  padding: 11px;
+  color: #0a0908;
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-bottom: 12px;
+}
+.btn-primary:hover { opacity: 0.88; }
+
+/* GAME LAYOUT */
+#game { display: none; flex-direction: column; min-height: 100vh; }
+
+/* HEADER */
+.game-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--gold-border);
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.game-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--gold);
+  font-style: italic;
+}
+.game-header .sub { font-size: 13px; color: var(--text3); }
+.badge {
+  margin-left: auto;
+  background: var(--red-dim);
+  border: 1px solid rgba(192,57,43,0.35);
+  color: #e07070;
+  border-radius: 99px;
+  font-size: 11px;
+  padding: 3px 12px;
+  font-family: 'Crimson Text', serif;
+  letter-spacing: 0.5px;
+}
+
+/* MAIN */
+.game-body { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 57px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid rgba(201,168,76,0.12);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.nav-section { padding: 1rem 0.75rem 0.5rem; }
+.nav-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  padding: 0 0.5rem;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+  transition: background 0.15s, color 0.15s;
+  border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+.nav-item .ni-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-item .ni-badge {
+  margin-left: auto;
+  background: rgba(201,168,76,0.25);
+  color: var(--gold);
+  border-radius: 99px;
+  font-size: 10px;
+  padding: 1px 6px;
+}
+.nav-item.has-dot::after {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid rgba(201,168,76,0.1);
+}
+.api-indicator { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
+.api-dot { width: 6px; height: 6px; background: #2ecc71; border-radius: 50%; }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SCENE */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.section-sub { font-size: 14px; color: var(--text3); margin-bottom: 1.25rem; }
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+.room-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.room-card:hover { border-color: var(--gold-border); background: var(--bg3); }
+.room-card.selected { border-color: var(--gold); background: var(--gold-dim); }
+.room-card.has-clues { border-color: rgba(201,168,76,0.2); }
+.room-icon-big { font-size: 28px; margin-bottom: 8px; }
+.room-card-name { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+.room-card-hint { font-size: 12px; color: var(--text3); font-style: italic; }
+.clue-pip {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 7px; height: 7px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+.room-detail {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.rd-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+}
+.rd-desc { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; font-style: italic; }
+.clue-list { display: flex; flex-direction: column; gap: 6px; }
+.clue-row {
+  background: var(--bg3);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.clue-row:hover { border-color: var(--gold-border); background: var(--gold-dim); }
+.clue-row.saved { opacity: 0.55; cursor: default; }
+.clue-icon { color: var(--gold); font-size: 14px; flex-shrink: 0; }
+.clue-add { margin-left: auto; font-size: 11px; color: var(--text3); }
+
+/* SUSPECTS */
+.suspect-cards { display: flex; flex-direction: column; gap: 12px; }
+.suspect-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-lg);
+  padding: 1.125rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.s-av {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 600;
+  flex-shrink: 0;
+}
+.s-body { flex: 1; min-width: 0; }
+.s-name { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+.s-role { font-size: 13px; color: var(--text3); margin-bottom: 6px; }
+.s-alibi {
+  font-size: 13px;
+  font-style: italic;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  border-left: 2px solid;
+  line-height: 1.5;
+}
+.btn-int {
+  background: transparent;
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.btn-int:hover { background: var(--gold-dim); }
+
+/* INTERROGATION */
+.inter-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+}
+.inter-header .s-av { width: 44px; height: 44px; font-size: 14px; }
+.inter-name { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); }
+.inter-role { font-size: 13px; color: var(--text3); margin-top: 1px; }
+
+.chat-window {
+  background: var(--bg);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  min-height: 200px;
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+.msg-suspect {
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--text);
+  max-width: 82%;
+  align-self: flex-start;
+  font-style: italic;
+  line-height: 1.65;
+  animation: fadeIn 0.25s ease;
+}
+.msg-detective {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-lg) 0 var(--radius-lg) var(--radius-lg);
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--gold-light);
+  max-width: 82%;
+  align-self: flex-end;
+  line-height: 1.65;
+  animation: fadeIn 0.25s ease;
+}
+.msg-thinking {
+  font-size: 13px;
+  color: var(--text3);
+  font-style: italic;
+  align-self: flex-start;
+  padding: 4px 0;
+  animation: pulse 1.2s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+.quick-qs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.qq {
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 99px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Crimson Text', serif;
+  transition: border-color 0.15s, color 0.15s;
+}
+.qq:hover { border-color: var(--gold-border); color: var(--gold); }
+
+.input-row { display: flex; gap: 8px; }
+.input-row input {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  color: var(--text);
+  font-family: 'Crimson Text', serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input-row input:focus { border-color: var(--gold-border); }
+.input-row input::placeholder { color: var(--text3); font-style: italic; }
+.btn-send {
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius);
+  padding: 9px 18px;
+  color: #0a0908;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.btn-send:hover { opacity: 0.85; }
+.btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* NOTES */
+.notes-empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-style: italic; }
+.note-card {
+  background: var(--bg2);
+  border-left: 2px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  animation: fadeIn 0.2s ease;
+}
+.note-src { font-size: 12px; color: var(--text3); margin-top: 3px; font-style: italic; }
+
+/* ACCUSE */
+.acc-intro {
+  font-size: 15px;
+  color: var(--text2);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg2);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.acc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.acc-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.acc-card:hover { border-color: var(--gold-border); background: var(--bg3); }
+.acc-card.selected { border-color: var(--gold); background: var(--gold-dim); }
+.acc-av { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; }
+.acc-name { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--text); }
+.btn-accuse {
+  width: 100%;
+  background: var(--red);
+  border: none;
+  border-radius: var(--radius);
+  padding: 13px;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  letter-spacing: 0.5px;
+}
+.btn-accuse:hover { opacity: 0.88; }
+.btn-accuse:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* REVELATION */
+#revelation {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+#revelation.show { display: flex; }
+.rev-box {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.rev-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+  text-align: center;
+  font-style: italic;
+}
+.rev-text { font-size: 15px; color: var(--text2); line-height: 1.8; white-space: pre-line; }
+.btn-close {
+  width: 100%;
+  margin-top: 1.5rem;
+  background: transparent;
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 10px;
+  color: var(--gold);
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+.btn-close:hover { background: var(--gold-dim); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg3);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  z-index: 50;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* SCROLLBARS */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 99px; }
+
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .game-body { flex-direction: column; height: auto; }
+  .content { padding: 1rem; }
+  .rooms-grid { grid-template-columns: repeat(2,1fr); }
+  .acc-grid { grid-template-columns: repeat(3,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- API KEY SCREEN -->
+<div id="api-screen">
+  <div class="api-card">
+    <div class="crest">🕯️</div>
+    <h1>Manoir Blackwood</h1>
+    <p>Un meurtre a été commis. Édouard Blackwood a été retrouvé mort dans sa bibliothèque.<br><br>Pour interroger les suspects avec l'IA, entrez votre clé API <strong>Groq</strong> — <em>gratuite</em>, inscription en 30 secondes.</p>
+    <input type="password" id="api-key-input" placeholder="gsk_..." />
+    <button class="btn-primary" onclick="startGame()">Commencer l'enquête</button>
+    <a href="https://console.groq.com/keys" target="_blank">→ Obtenir une clé Groq gratuite (console.groq.com)</a>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <div class="game-header">
+    <span style="font-size:20px;">🕯️</span>
+    <div>
+      <h1>Manoir Blackwood</h1>
+      <div class="sub">Nuit du 14 novembre — Meurtre d'Édouard Blackwood</div>
+    </div>
+    <div class="badge">⚠ Enquête ouverte</div>
+  </div>
+
+  <div class="game-body">
+    <div class="sidebar">
+      <div class="nav-section">
+        <div class="nav-label">Enquête</div>
+        <div class="nav-item active" onclick="goPanel('scene')" data-panel="scene">
+          <span class="ni-icon">🗺</span> Scène de crime
+        </div>
+        <div class="nav-item" onclick="goPanel('suspects')" data-panel="suspects">
+          <span class="ni-icon">👥</span> Suspects
+        </div>
+        <div class="nav-item" onclick="goPanel('interrogate')" data-panel="interrogate">
+          <span class="ni-icon">💬</span> Interrogatoire
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Dossier</div>
+        <div class="nav-item" onclick="goPanel('notes')" data-panel="notes">
+          <span class="ni-icon">📋</span> Carnet d'indices
+          <span class="ni-badge" id="note-badge">0</span>
+        </div>
+        <div class="nav-item" onclick="goPanel('accuse')" data-panel="accuse">
+          <span class="ni-icon">⚖️</span> Porter accusation
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="api-indicator"><span class="api-dot"></span> IA connectée</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- SCENE -->
+      <div class="panel active" id="panel-scene">
+        <div class="section-title">Scène de crime</div>
+        <div class="section-sub">Inspectez chaque pièce du manoir. Les indices marqués d'un point peuvent être ajoutés à votre carnet.</div>
+        <div class="rooms-grid">
+          <div class="room-card has-clues" onclick="openRoom('bib')" id="rc-bib">
+            <div class="clue-pip"></div>
+            <div class="room-icon-big">📚</div>
+            <div class="room-card-name">Bibliothèque</div>
+            <div class="room-card-hint">Scène du crime</div>
+          </div>
+          <div class="room-card has-clues" onclick="openRoom('sal')" id="rc-sal">
+            <div class="clue-pip"></div>
+            <div class="room-icon-big">🛋</div>
+            <div class="room-card-name">Salon</div>
+            <div class="room-card-hint">Dernier repas</div>
+          </div>
+          <div class="room-card" onclick="openRoom('cui')" id="rc-cui">
+            <div class="room-icon-big">🍽</div>
+            <div class="room-card-name">Cuisine</div>
+            <div class="room-card-hint">Accès service</div>
+          </div>
+          <div class="room-card has-clues" onclick="openRoom('bur')" id="rc-bur">
+            <div class="clue-pip"></div>
+            <div class="room-icon-big">🗂</div>
+            <div class="room-card-name">Bureau</div>
+            <div class="room-card-hint">Documents privés</div>
+          </div>
+          <div class="room-card" onclick="openRoom('jar')" id="rc-jar">
+            <div class="room-icon-big">🌿</div>
+            <div class="room-card-name">Jardin</div>
+            <div class="room-card-hint">Accès extérieur</div>
+          </div>
+          <div class="room-card has-clues" onclick="openRoom('cha')" id="rc-cha">
+            <div class="clue-pip"></div>
+            <div class="room-icon-big">🛏</div>
+            <div class="room-card-name">Chambre de Clara</div>
+            <div class="room-card-hint">Affaires personnelles</div>
+          </div>
+        </div>
+        <div id="room-detail" style="display:none;"></div>
+      </div>
+
+      <!-- SUSPECTS -->
+      <div class="panel" id="panel-suspects">
+        <div class="section-title">Les suspects</div>
+        <div class="section-sub">Trois personnes se trouvaient au manoir cette nuit-là. Chacune a ses secrets.</div>
+        <div class="suspect-cards">
+          <div class="suspect-card">
+            <div class="s-av" style="background:var(--purple-dim);color:#b89fd4;">CD</div>
+            <div class="s-body">
+              <div class="s-name">Clara Dupont, 34 ans</div>
+              <div class="s-role">Secrétaire personnelle — 8 ans de service</div>
+              <div class="s-alibi" style="background:var(--purple-dim);border-color:var(--purple);color:#b89fd4;">
+                « J'étais dans ma chambre avec un terrible mal de tête. J'ai pris des cachets et je me suis allongée. »
+              </div>
+            </div>
+            <button class="btn-int" onclick="pickSuspect('clara')">Interroger →</button>
+          </div>
+          <div class="suspect-card">
+            <div class="s-av" style="background:var(--coral-dim);color:#d4a07a;">VM</div>
+            <div class="s-body">
+              <div class="s-name">Victor Moreau, 28 ans</div>
+              <div class="s-role">Neveu et unique héritier du manoir</div>
+              <div class="s-alibi" style="background:var(--coral-dim);border-color:var(--coral);color:#d4a07a;">
+                « Je lisais dans le salon jusqu'à minuit passé. Je n'ai rien entendu d'anormal. »
+              </div>
+            </div>
+            <button class="btn-int" onclick="pickSuspect('victor')">Interroger →</button>
+          </div>
+          <div class="suspect-card">
+            <div class="s-av" style="background:var(--teal-dim);color:#7ac4b4;">HF</div>
+            <div class="s-body">
+              <div class="s-name">Henri Fabre, 61 ans</div>
+              <div class="s-role">Majordome — 25 ans au service des Blackwood</div>
+              <div class="s-alibi" style="background:var(--teal-dim);border-color:var(--teal);color:#7ac4b4;">
+                « Je faisais la vaisselle du dîner en cuisine. J'y suis resté jusqu'à ce que j'entende le cri de Monsieur Victor. »
+              </div>
+            </div>
+            <button class="btn-int" onclick="pickSuspect('henri')">Interroger →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERROGATOIRE -->
+      <div class="panel" id="panel-interrogate">
+        <div id="inter-empty" style="text-align:center;padding:3rem 1rem;color:var(--text3);font-style:italic;">
+          Sélectionnez un suspect dans l'onglet "Suspects" pour commencer l'interrogatoire.
+        </div>
+        <div id="inter-active" style="display:none;">
+          <div class="inter-header">
+            <div class="s-av" id="i-av" style="width:44px;height:44px;font-size:14px;"></div>
+            <div>
+              <div class="inter-name" id="i-name"></div>
+              <div class="inter-role" id="i-role"></div>
+            </div>
+          </div>
+          <div class="quick-qs">
+            <span class="qq" onclick="ask('Où étiez-vous exactement au moment du crime ?')">Où étiez-vous ?</span>
+            <span class="qq" onclick="ask('Aviez-vous un motif contre Édouard Blackwood ?')">Quel motif ?</span>
+            <span class="qq" onclick="ask('Avez-vous vu ou entendu quelque chose d\'inhabituel cette nuit-là ?')">Vu quelque chose ?</span>
+            <span class="qq" onclick="ask('Qui soupçonnez-vous d\'avoir commis ce crime ?')">Qui soupçonnez-vous ?</span>
+            <span class="qq" onclick="ask('Parlez-moi de votre relation avec les autres personnes présentes au manoir.')">Relations ?</span>
+          </div>
+          <div class="chat-window" id="chat"></div>
+          <div class="input-row">
+            <input type="text" id="q-in" placeholder="Votre question pour le suspect..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendQ()"/>
+            <button class="btn-send" id="btn-send" onclick="sendQ()">Envoyer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="panel" id="panel-notes">
+        <div class="section-title">Carnet d'indices</div>
+        <div class="section-sub">Les preuves que vous avez collectées au fil de l'enquête.</div>
+        <div id="notes-empty" class="notes-empty">Aucun indice collecté pour l'instant.<br>Explorez les pièces de la scène de crime.</div>
+        <div id="notes-list"></div>
+      </div>
+
+      <!-- ACCUSER -->
+      <div class="panel" id="panel-accuse">
+        <div class="section-title">Porter une accusation</div>
+        <p class="acc-intro">
+          « Le moment est venu de désigner le coupable. Réfléchissez bien — une fausse accusation
+          pourrait laisser le vrai meurtrier en liberté. Examinez vos indices, relisez vos interrogatoires,
+          et que la vérité éclate. »
+        </p>
+        <div class="acc-grid">
+          <div class="acc-card" id="ac-clara" onclick="pickAcc('clara')">
+            <div class="acc-av" style="background:var(--purple-dim);color:#b89fd4;">CD</div>
+            <div class="acc-name">Clara Dupont</div>
+          </div>
+          <div class="acc-card" id="ac-victor" onclick="pickAcc('victor')">
+            <div class="acc-av" style="background:var(--coral-dim);color:#d4a07a;">VM</div>
+            <div class="acc-name">Victor Moreau</div>
+          </div>
+          <div class="acc-card" id="ac-henri" onclick="pickAcc('henri')">
+            <div class="acc-av" style="background:var(--teal-dim);color:#7ac4b4;">HF</div>
+            <div class="acc-name">Henri Fabre</div>
+          </div>
+        </div>
+        <button class="btn-accuse" id="btn-acc" disabled onclick="doAccuse()">⚖ Porter l'accusation</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- REVELATION MODAL -->
+<div id="revelation">
+  <div class="rev-box">
+    <div class="rev-title" id="rev-title"></div>
+    <div class="rev-text" id="rev-text"></div>
+    <button class="btn-close" onclick="closeRev()">Fermer le dossier</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const ROOMS = {
+  bib: {
+    name: "Bibliothèque — Scène du crime",
+    desc: "La pièce est glaciale. Édouard Blackwood gît sur le tapis persan, une expression de stupeur figée sur le visage. La porte était verrouillée de l'intérieur — mais la fenêtre côté jardin présente des traces de forçage récent. Une odeur subtile d'amande amère flotte encore dans l'air.",
+    clues: [
+      "Verre de cognac renversé sur le bureau — traces d'une poudre blanche au fond",
+      "Fenêtre côté jardin : traces de forçage depuis l'extérieur — incohérent avec la clé intérieure",
+      "Testament récent posé sur le bureau : Victor Moreau a été rayé de l'héritage trois jours avant le meurtre"
+    ]
+  },
+  sal: {
+    name: "Salon — Lieu du dernier repas",
+    desc: "La table du dîner n'a pas encore été débarrassée. Trois couverts. L'assiette de Victor est presque intacte — il n'avait pas faim. Un roman de poche est posé sur le fauteuil, ouvert à la page 1.",
+    clues: [
+      "Roman de Victor : aucune trace d'usure sur la couverture, les pages n'ont pas été tournées",
+      "Bouteille de vin bordeaux : une seule empreinte digitale sur le goulot, index et pouce gauches"
+    ]
+  },
+  cui: {
+    name: "Cuisine — Accès de service",
+    desc: "La batterie de cuisine brille. Une pile d'assiettes est posée sur le plan de travail — propres et sèches. Henri prétend avoir fait la vaisselle ce soir-là, pourtant l'évier est parfaitement sec. La porte de service donnant sur le jardin présente des traces de boue fraîche sur le seuil.",
+    clues: []
+  },
+  bur: {
+    name: "Bureau privé d'Édouard",
+    desc: "Les tiroirs ont été fouillés — et récemment. Plusieurs dossiers sont éparpillés sur le tapis. Une lettre non cachetée, adressée à Maître Rousseau, traîne à mi-rédigée sur le bureau.",
+    clues: [
+      "Lettre à l'avocat : convocation pour signer le licenciement immédiat de Clara Dupont, prévu le lendemain matin",
+      "Coffre-fort encastré dans le mur : ouvert et entièrement vide — la combinaison n'était connue que de Henri Fabre"
+    ]
+  },
+  jar: {
+    name: "Jardin — Accès extérieur",
+    desc: "La nuit fut pluvieuse. Le sol est détrempé, les allées transformées en boue. On distingue clairement des traces de pas entre la fenêtre de la bibliothèque et la porte de service de la cuisine — aller-retour.",
+    clues: []
+  },
+  cha: {
+    name: "Chambre de Clara Dupont",
+    desc: "Impeccablement rangée. Trop rangée pour quelqu'un qui prétend avoir souffert d'une migraine toute la soirée. Le lit n'est pas défait. Sur la table de nuit, un tube d'aspirine intact. Dans la corbeille à papier, quelque chose a été jeté.",
+    clues: [
+      "Gants en latex fins dans la corbeille — des fibres cramoisies correspondent au tapis de la bibliothèque",
+      "Ordonnance médicale au nom de Clara Dupont : acquisition légale de cyanure de potassium pour la photographie argentique — datée de la semaine précédente"
+    ]
+  }
+};
+
+const SUSPECTS = {
+  clara: {
+    name: "Clara Dupont", role: "Secrétaire personnelle",
+    av: "CD", bg: "var(--purple-dim)", tc: "#b89fd4",
+    system: `Tu incarnes Clara Dupont, 34 ans, secrétaire personnelle d'Édouard Blackwood depuis 8 ans, dans un jeu de murder mystery interactif. Tu es la COUPABLE mais tu le dissimules absolument. Voici la vérité que tu caches : tu as empoisonné le verre de cognac d'Édouard avec du cyanure de potassium que tu possèdes légalement pour ton hobby de photographie argentique. Tu avais deux mobiles : tu venais de découvrir que tu allais être licenciée le lendemain matin, et Édouard t'avait promis il y a trois ans une part de son héritage — promesse qu'il n'a jamais honorée. Après le crime, tu as forcé la fenêtre de la bibliothèque depuis le jardin pour simuler une intrusion extérieure. Tu portais des gants en latex que tu as jetés dans ta corbeille. Tu incarnes ce personnage avec subtilité : tu joues l'innocente dévastée, tu nies avec une dignité blessée, tu esquives les questions directes avec des réponses émotionnelles. Tu peux mentir, manipuler, pleurer. Ne te trahis JAMAIS spontanément. Réponds en français, 2 à 4 phrases naturelles dans le style d'un thriller psychologique.`
+  },
+  victor: {
+    name: "Victor Moreau", role: "Neveu héritier",
+    av: "VM", bg: "var(--coral-dim)", tc: "#d4a07a",
+    system: `Tu incarnes Victor Moreau, 28 ans, neveu d'Édouard Blackwood et son héritier (du moins le croyait-il), dans un jeu de murder mystery interactif. Tu n'es PAS le coupable, mais tu as de lourds secrets : tu as des dettes de jeu considérables, tu savais que tu avais été rayé du testament (tu l'as découvert en fouillant le bureau de ton oncle deux jours avant), et ce soir-là tu ne lisais pas vraiment — tu réfléchissais à la manière d'obtenir de l'argent. Tu as entendu un bruit sourd venant du jardin vers 22h30 mais tu n'y as pas prêté attention. Tu te comportes en suspect classique : nerveux, sur la défensive, parfois agressif, tu sembles cacher quelque chose (tes dettes) même si ce n'est pas le meurtre. Réponds en français, 2 à 4 phrases naturelles et réalistes.`
+  },
+  henri: {
+    name: "Henri Fabre", role: "Majordome",
+    av: "HF", bg: "var(--teal-dim)", tc: "#7ac4b4",
+    system: `Tu incarnes Henri Fabre, 61 ans, majordome du Manoir Blackwood depuis 25 ans, dans un jeu de murder mystery interactif. Tu n'es PAS le coupable. Tu es loyal, discret, posé — un homme qui a consacré sa vie à cette famille. Tu connais tous les secrets du manoir : la combinaison du coffre (que tu n'as pas utilisée cette nuit-là), le contenu du testament, les tensions entre Édouard et Clara. Ce soir-là, tu faisais réellement la vaisselle — mais tu mens sur un point crucial : tu as vu Clara sortir par la porte de service vers 22h15, tenant quelque chose qui ressemblait à un petit flacon. Tu te tais par loyauté envers Clara, que tu connais depuis des années. Mais sous une pression suffisante de la part du détective, tu pourrais laisser échapper des détails. Réponds en français, 2 à 4 phrases mesurées, chaque mot pesé.`
+  }
+};
+
+let apiKey = '';
+let currentSuspect = null;
+let accused = null;
+let notes = [];
+let chatHistories = { clara: [], victor: [], henri: [] };
+let sending = false;
+
+function startGame() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (!k || !k.startsWith('gsk_')) {
+    showToast('Clé Groq invalide — elle doit commencer par gsk_');
+    return;
+  }
+  apiKey = k;
+  document.getElementById('api-screen').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+}
+
+function goPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelector(`[data-panel="${name}"]`).classList.add('active');
+}
+
+function openRoom(r) {
+  document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rc-' + r).classList.add('selected');
+  const rm = ROOMS[r];
+  let html = `<div class="room-detail"><div class="rd-name">${rm.name}</div><div class="rd-desc">${rm.desc}</div>`;
+  if (rm.clues.length > 0) {
+    html += '<div class="clue-list">';
+    rm.clues.forEach(cl => {
+      const saved = notes.find(n => n.t === cl);
+      html += `<div class="clue-row${saved ? ' saved' : ''}" onclick="addNote('${cl.replace(/'/g,"\\'")}','${rm.name.replace(/'/g,"\\'")}')">
+        <span class="clue-icon">🔍</span>
+        <span style="flex:1;">${cl}</span>
+        <span class="clue-add">${saved ? '✓ Noté' : '+ Carnet'}</span>
+      </div>`;
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="font-size:13px;color:var(--text3);font-style:italic;margin-top:4px;">Aucun indice notable dans cette pièce.</div>';
+  }
+  html += '</div>';
+  const rd = document.getElementById('room-detail');
+  rd.innerHTML = html;
+  rd.style.display = 'block';
+}
+
+function addNote(txt, src) {
+  if (notes.find(n => n.t === txt)) { showToast('Indice déjà dans le carnet'); return; }
+  notes.push({ t: txt, s: src });
+  document.getElementById('note-badge').textContent = notes.length;
+  document.getElementById('notes-empty').style.display = 'none';
+  const d = document.createElement('div');
+  d.className = 'note-card';
+  d.innerHTML = `🔍 ${txt}<div class="note-src">${src}</div>`;
+  document.getElementById('notes-list').appendChild(d);
+  showToast('Indice ajouté au carnet');
+  openRoom(Object.keys(ROOMS).find(k => ROOMS[k].name === src || src.startsWith(ROOMS[k].name.split(' ')[0])) || Object.keys(ROOMS)[0]);
+}
+
+function pickSuspect(s) {
+  currentSuspect = s;
+  const sp = SUSPECTS[s];
+  document.getElementById('inter-empty').style.display = 'none';
+  document.getElementById('inter-active').style.display = 'block';
+  const av = document.getElementById('i-av');
+  av.textContent = sp.av; av.style.background = sp.bg; av.style.color = sp.tc;
+  document.getElementById('i-name').textContent = sp.name;
+  document.getElementById('i-role').textContent = sp.role;
+  const chat = document.getElementById('chat');
+  chat.innerHTML = '';
+  const hist = chatHistories[s];
+  if (hist.length === 0) {
+    const intro = s === 'clara' ? "Je suis... dévastée, inspecteur. Édouard était bien plus qu'un patron pour moi. Depuis ce matin je n'arrive pas à réaliser ce qui s'est passé."
+      : s === 'victor' ? "Je coopère pleinement, mais franchement je trouve ces questions déplacées. Mon oncle vient de mourir, et on m'interroge comme si j'étais suspect."
+      : "Monsieur, j'ai consacré vingt-cinq ans de ma vie à cette famille. Ce qui s'est passé cette nuit est... une tragédie sans nom. Je répondrai à toutes vos questions.";
+    appendMsg(intro, 'suspect');
+  } else {
+    hist.forEach(m => appendMsg(m.content, m.role === 'user' ? 'detective' : 'suspect'));
+  }
+  goPanel('interrogate');
+}
+
+function appendMsg(text, type) {
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = type === 'suspect' ? 'msg-suspect' : 'msg-detective';
+  d.textContent = text;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function ask(q) { document.getElementById('q-in').value = q; sendQ(); }
+
+async function sendQ() {
+  if (sending || !currentSuspect) return;
+  const input = document.getElementById('q-in');
+  const q = input.value.trim();
+  if (!q) return;
+  sending = true;
+  input.value = '';
+  input.disabled = true;
+  document.getElementById('btn-send').disabled = true;
+
+  appendMsg(q, 'detective');
+  chatHistories[currentSuspect].push({ role: 'user', content: q });
+
+  const thinking = document.createElement('div');
+  thinking.className = 'msg-thinking';
+  thinking.textContent = SUSPECTS[currentSuspect].name + ' réfléchit...';
+  document.getElementById('chat').appendChild(thinking);
+  document.getElementById('chat').scrollTop = 9999;
+
+  try {
+    const sp = SUSPECTS[currentSuspect];
+    const messages = [
+      { role: 'system', content: sp.system },
+      ...chatHistories[currentSuspect].map(m => ({ role: m.role, content: m.content }))
+    ];
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1000,
+        messages
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Erreur API');
+    const reply = data.choices?.[0]?.message?.content || '...';
+    thinking.remove();
+    appendMsg(reply, 'suspect');
+    chatHistories[currentSuspect].push({ role: 'assistant', content: reply });
+  } catch(e) {
+    thinking.remove();
+    const err = document.createElement('div');
+    err.className = 'msg-thinking';
+    err.textContent = 'Erreur : ' + e.message;
+    document.getElementById('chat').appendChild(err);
+  }
+
+  sending = false;
+  input.disabled = false;
+  document.getElementById('btn-send').disabled = false;
+  input.focus();
+}
+
+function pickAcc(s) {
+  accused = s;
+  document.querySelectorAll('.acc-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('ac-' + s).classList.add('selected');
+  document.getElementById('btn-acc').disabled = false;
+}
+
+async function doAccuse() {
+  if (!accused) return;
+  document.getElementById('btn-acc').disabled = true;
+  const names = { clara: 'Clara Dupont', victor: 'Victor Moreau', henri: 'Henri Fabre' };
+  const correct = accused === 'clara';
+  document.getElementById('rev-title').textContent = correct ? '⚖ Affaire résolue' : '✗ Mauvaise piste...';
+  document.getElementById('rev-text').textContent = 'Révélation en cours...';
+  document.getElementById('revelation').classList.add('show');
+
+  try {
+    const prompt = correct
+      ? `Le détective-joueur vient d'accuser Clara Dupont du meurtre d'Édouard Blackwood — c'est exact. Écris une révélation dramatique et cinématique en français (environ 250 mots) : décris comment Clara a réellement commis le crime (cyanure dans le cognac, sortie par le jardin, forçage de la fenêtre pour simuler une intrusion, gants en latex jetés dans sa corbeille), révèle ses deux mobiles (licenciement imminent + héritage promis jamais honoré), mentionne qu'Henri avait aperçu quelque chose mais s'était tu par loyauté. Félicite chaleureusement le détective pour sa perspicacité. Style thriller littéraire, atmosphère sombre et élégante.`
+      : `Le détective-joueur vient d'accuser ${names[accused]} du meurtre d'Édouard Blackwood — c'est une erreur. La vraie coupable est Clara Dupont. Écris une révélation en français (environ 250 mots) : explique pourquoi ${names[accused]} est innocent(e), puis révèle la vérité sur Clara (cyanure dans le cognac, sortie par le jardin, forçage de la fenêtre, gants en latex, mobiles : licenciement + héritage). Montre ce que le détective a manqué. Style thriller littéraire, atmosphère sombre. Conclus en lui disant que Clara a pris la fuite.`;
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || '...';
+    document.getElementById('rev-text').textContent = text;
+  } catch(e) {
+    document.getElementById('rev-text').textContent = 'Erreur lors de la révélation : ' + e.message;
+  }
+}
+
+function closeRev() {
+  document.getElementById('revelation').classList.remove('show');
+  document.getElementById('btn-acc').disabled = false;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
