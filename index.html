@@ -915,12 +915,317 @@ body::before {
 .diff-icon { font-size:20px; margin-bottom:4px; }
 .diff-name { font-family:'Playfair Display',serif; font-size:13px; color:var(--ink); margin-bottom:3px; }
 .diff-desc { font-size:11px; color:var(--ink3); line-height:1.4; font-style:italic; }
+
+/* ══════════════════════════════
+   MENU SCREEN
+══════════════════════════════ */
+#s-menu {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: #06050a;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(90,60,20,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(60,30,80,0.15) 0%, transparent 50%);
+  overflow-y: auto;
+  padding: 0;
+}
+
+.menu-top {
+  width: 100%;
+  padding: 2.5rem 2rem 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+.menu-logo {
+  font-size: 36px;
+  margin-bottom: 1rem;
+  display: block;
+  animation: flicker 4s ease-in-out infinite;
+}
+.menu-game-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5vw, 60px);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 0 0 60px rgba(184,151,58,0.25);
+  margin-bottom: 0.4rem;
+}
+.menu-game-title span { color: var(--gold); }
+.menu-tagline {
+  font-family: 'IM Fell English', serif;
+  font-size: 13px;
+  color: var(--ink3);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+.menu-divider {
+  width: min(600px, 80%);
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-border), transparent);
+  margin: 1.5rem auto;
+  flex-shrink: 0;
+}
+
+.menu-section-label {
+  font-family: 'IM Fell English', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* SCENARIO CARDS */
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  width: min(900px, 92%);
+  margin: 0 auto 2rem;
+  padding-bottom: 2rem;
+}
+
+.scenario-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  background: var(--bg2);
+}
+.scenario-card:hover:not(.locked) {
+  transform: translateY(-4px);
+  border-color: var(--gold-border);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(184,151,58,0.1);
+}
+.scenario-card.locked {
+  cursor: default;
+  opacity: 0.6;
+  filter: grayscale(0.4);
+}
+.scenario-card.selected-scenario {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(184,151,58,0.3), 0 12px 40px rgba(0,0,0,0.5);
+}
+
+.scenario-thumb {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+.scenario-thumb-placeholder {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  background: var(--bg3);
+}
+
+.scenario-info {
+  padding: 1rem 1.1rem;
+}
+.scenario-tag {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-d);
+  font-family: 'IM Fell English', serif;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.scenario-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.scenario-desc {
+  font-size: 13px;
+  color: var(--ink3);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.scenario-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.scenario-pill {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 99px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--ink3);
+}
+.scenario-pill.gold { border-color: var(--gold-border); color: var(--gold-d); }
+
+.locked-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(0,0,0,0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 99px;
+  padding: 3px 12px;
+  font-size: 11px;
+  color: var(--ink3);
+  font-family: 'IM Fell English', serif;
+  letter-spacing: 1px;
+  backdrop-filter: blur(4px);
+}
+
+/* DIFFICULTY ON MENU */
+.menu-diff-section {
+  width: min(900px, 92%);
+  margin: 0 auto 2rem;
+}
+.menu-diff-label {
+  font-family: 'IM Fell English', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 12px;
+}
+.menu-diff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* LAUNCH BUTTON */
+.menu-launch-area {
+  width: min(900px, 92%);
+  margin: 0 auto 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.btn-launch {
+  background: linear-gradient(135deg, var(--gold-d), var(--gold-l));
+  border: none;
+  border-radius: var(--radius);
+  padding: 15px 60px;
+  color: #06050a;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(184,151,58,0.3);
+}
+.btn-launch:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(184,151,58,0.4); }
+.btn-launch:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+.menu-launch-hint { font-size: 13px; color: var(--ink4); font-style: italic; }
 </style>
 </head>
 <body>
 
+<!-- ══ MENU SCREEN ══ -->
+<div class="screen active" id="s-menu">
+  <div class="menu-top">
+    <span class="menu-logo">🕯️</span>
+    <div class="menu-game-title">Dead <span>Secrets</span></div>
+    <div class="menu-tagline">Jeux d'enquête criminelle</div>
+  </div>
+
+  <div class="menu-divider"></div>
+  <div class="menu-section-label">Choisissez votre enquête</div>
+
+  <div class="scenarios-grid">
+    <!-- SCENARIO 1 : Blackwood (available) -->
+    <div class="scenario-card selected-scenario" id="sc-blackwood" onclick="selectScenario('blackwood')">
+      <div class="scenario-thumb-placeholder" style="background:linear-gradient(135deg,#1a1208,#2a1f10);">🏚️</div>
+      <div class="scenario-info">
+        <div class="scenario-tag">🔍 Disponible · Cas nº 001</div>
+        <div class="scenario-name">Le Manoir Blackwood</div>
+        <div class="scenario-desc">Un millionnaire retrouvé mort dans sa bibliothèque verrouillée. Trois suspects. Une seule vérité.</div>
+        <div class="scenario-meta">
+          <span class="scenario-pill gold">👤 3 suspects</span>
+          <span class="scenario-pill gold">🗺 6 pièces</span>
+          <span class="scenario-pill">⏱ ~45 min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO 2 : coming soon -->
+    <div class="scenario-card locked">
+      <div class="locked-badge">Bientôt disponible</div>
+      <div class="scenario-thumb-placeholder" style="background:linear-gradient(135deg,#080d1a,#101828);">🚢</div>
+      <div class="scenario-info">
+        <div class="scenario-tag">🔒 Cas nº 002</div>
+        <div class="scenario-name">Le Paquebot Élysée</div>
+        <div class="scenario-desc">Un ambassadeur assassiné en pleine mer. Neuf passagers suspects. Nulle part où fuir.</div>
+        <div class="scenario-meta">
+          <span class="scenario-pill">👤 5 suspects</span>
+          <span class="scenario-pill">🗺 8 pièces</span>
+          <span class="scenario-pill">⏱ ~60 min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENARIO 3 : coming soon -->
+    <div class="scenario-card locked">
+      <div class="locked-badge">Bientôt disponible</div>
+      <div class="scenario-thumb-placeholder" style="background:linear-gradient(135deg,#0a0f0a,#141e14);">🏛️</div>
+      <div class="scenario-info">
+        <div class="scenario-tag">🔒 Cas nº 003</div>
+        <div class="scenario-name">Le Musée des Ombres</div>
+        <div class="scenario-desc">Un conservateur retrouvé sous un tableau volé. L'art dissimule toujours les pires crimes.</div>
+        <div class="scenario-meta">
+          <span class="scenario-pill">👤 4 suspects</span>
+          <span class="scenario-pill">🗺 7 pièces</span>
+          <span class="scenario-pill">⏱ ~50 min</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-diff-section">
+    <div class="menu-diff-label">Niveau de difficulté</div>
+    <div class="menu-diff-grid">
+      <div class="diff-btn active" id="diff-hard" onclick="pickDiff('hard')">
+        <div class="diff-icon">🔍</div>
+        <div class="diff-name">Difficile</div>
+        <div class="diff-desc">Descriptions brutes — déduisez tout seul</div>
+      </div>
+      <div class="diff-btn" id="diff-medium" onclick="pickDiff('medium')">
+        <div class="diff-icon">🕯</div>
+        <div class="diff-name">Moyen</div>
+        <div class="diff-desc">Indices sensoriels mis en valeur</div>
+      </div>
+      <div class="diff-btn" id="diff-easy" onclick="pickDiff('easy')">
+        <div class="diff-icon">💡</div>
+        <div class="diff-name">Facile</div>
+        <div class="diff-desc">Plus explicite pour débutants</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-launch-area">
+    <button class="btn-launch" id="btn-launch" onclick="launchScenario()">Commencer l'enquête</button>
+    <div class="menu-launch-hint" id="launch-hint">Manoir Blackwood sélectionné</div>
+  </div>
+</div>
+
 <!-- ══ API SCREEN ══ -->
-<div class="screen active" id="s-api">
+<div class="screen" id="s-api">
   <div class="api-crest">🕯️</div>
   <div class="api-title">Manoir Blackwood</div>
   <div class="api-sub">Une enquête pour meurtres</div>
@@ -1234,6 +1539,20 @@ Tu es posé, mesurant chaque mot. Sous une pression forte et répétée, tu pour
 
 // ── NARRATOR SYSTEM ──
 let difficulty = 'hard';
+let selectedScenario = 'blackwood';
+
+function selectScenario(id) {
+  selectedScenario = id;
+  document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected-scenario'));
+  document.getElementById('sc-' + id).classList.add('selected-scenario');
+  const names = { blackwood: 'Manoir Blackwood' };
+  document.getElementById('launch-hint').textContent = (names[id] || id) + ' sélectionné';
+}
+
+function launchScenario() {
+  // Go to API key screen
+  goScreen('s-api');
+}
 
 function pickDiff(d) {
   difficulty = d;
